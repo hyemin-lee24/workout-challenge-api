@@ -16,7 +16,7 @@ public class UserService {
 
     public UserDto.UserResponse registerUser(UserDto.SignUpRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new IllegalArgumentException("This email already exists.");
         }
 
         User user = User.builder()

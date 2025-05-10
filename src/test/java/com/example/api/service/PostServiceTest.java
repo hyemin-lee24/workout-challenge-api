@@ -26,7 +26,7 @@ public class PostServiceTest {
     private User testUser;
 
     @BeforeEach
-    void setUp() {
+    void setUpUser() {
         testUser = User.builder()
                 .email("test@user.com")
                 .password("password123")
@@ -49,6 +49,12 @@ public class PostServiceTest {
 
         assertThat(response.getId()).isNotNull();
         assertThat(response.getTitle()).isEqualTo("서비스 게시글");
-        assertThat(response.getUserId().getId()).isEqualTo(testUser.getId());
+        assertThat(response.getUser().getId()).isEqualTo(testUser.getId());
+
+        PostDto.PostResponse getPost = postService.getPost(response.getId());
+
+        assertThat(getPost.getUser().getId()).isEqualTo(testUser.getId());
+        assertThat(getPost.getTitle()).isEqualTo("서비스 게시글");
+        assertThat(getPost.getContent()).isEqualTo("서비스 게시글 내용");
     }
 }

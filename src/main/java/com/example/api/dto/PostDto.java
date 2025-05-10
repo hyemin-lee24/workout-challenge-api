@@ -24,7 +24,7 @@ public class PostDto {
     @Builder
     public static class PostResponse {
         private Long id;
-        private User userId;
+        private User user;
         private String title;
         private String content;
         private String imageUrl;
@@ -34,7 +34,7 @@ public class PostDto {
         public static PostDto.PostResponse from(Post post) {
             return PostDto.PostResponse.builder()
                     .id(post.getId())
-                    .userId(post.getUser())
+                    .user(post.getUser())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .imageUrl(post.getImageUrl())

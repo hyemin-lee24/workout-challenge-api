@@ -30,4 +30,19 @@ public class PostService {
         Post savedPost = postRepository.save(post);
         return PostDto.PostResponse.from(savedPost);
     }
+
+    public PostDto.PostResponse getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        return PostDto.PostResponse.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .imageUrl(post.getImageUrl())
+                .createdAt(post.getCreatedAt())
+                .user(post.getUser())
+                .authorNickname(post.getUser().getNickname())
+                .build();
+    }
 }
