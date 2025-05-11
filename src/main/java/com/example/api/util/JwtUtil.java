@@ -1,42 +1,71 @@
 package com.example.api.util;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    //TODO
-    private final String secretKey = "secretKey";
-    private final long EXPIRATION = 1000L * 60 * 60 * 24;
 
-    public String generateToken(String email) {
+    private final Key secretKey;
+
+    public JwtUtil() {
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    }
+
+    public String generateToken(Long userId, String email, String nickname) {
         return Jwts.builder()
                 .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+                .claim("userId", userId)
+                .claim("nickname", nickname)
+                .setExpiration(new Date(System.currentTimeMillis() + 864_000_00))
+                .signWith(secretKey)
                 .compact();
+    }
+
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes())
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public boolean validateToken(String token) {
+        System.out.println("==> valid : " + token);
         try {
-            getEmailFromToken(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            System.out.println("JWT token has expired");
+            return false;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("JWT validation failed: " + e.getMessage());
             return false;
         }
     }
+
 }
