@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS "WorkoutData" (
     duration_seconds INT NOT NULL,
     avg_speed FLOAT NOT NULL,
     calories_burned FLOAT NOT NULL,
-    location_data JSON
+    location_data JSON,
+    deleted BOOLEAN DEFAULT FALSE
 );
 
 -- Comment 테이블 생성

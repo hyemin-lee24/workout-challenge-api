@@ -39,5 +39,12 @@ public class WorkoutData {
     private float caloriesBurned;
 
     @Column(name = "location_data", columnDefinition = "TEXT")
-    private String locationData; // JSON을 TEXT로 변경
+    private String locationData;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    public void softDelete() {
+        this.deleted = true;
+    }
 }
