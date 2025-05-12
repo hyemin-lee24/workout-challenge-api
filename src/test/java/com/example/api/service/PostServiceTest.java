@@ -5,7 +5,6 @@ import com.example.api.mapper.UserRepository;
 import com.example.api.model.User;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -62,8 +61,7 @@ public class PostServiceTest {
     }
 
     long createPost(String title, String content) {
-        PostDto.CreateRequest post = PostDto.CreateRequest.builder()
-                .user(testUser.getId())
+        PostDto.PostRequest post = PostDto.PostRequest.builder()
                 .title(title)
                 .content(content)
                 .build();

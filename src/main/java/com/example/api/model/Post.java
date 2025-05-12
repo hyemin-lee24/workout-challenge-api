@@ -23,6 +23,9 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+    private WorkoutData workoutData;
+
     @Column(nullable = false, length = 255)
     private String title;
 

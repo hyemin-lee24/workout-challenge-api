@@ -3,6 +3,7 @@ package com.example.api.dto;
 
 import com.example.api.model.Post;
 import com.example.api.model.User;
+import com.example.api.model.WorkoutData;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -12,11 +13,11 @@ public class PostDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class CreateRequest {
-        private Long user;
+    public static class PostRequest {
         private String title;
         private String content;
         private String imageUrl;
+        private WorkoutDataDto.WorkoutDataRequest workoutData;
     }
 
     @Getter
@@ -24,21 +25,20 @@ public class PostDto {
     @Builder
     public static class PostResponse {
         private Long id;
-        private User user;
         private String title;
         private String content;
         private String imageUrl;
         private LocalDateTime createdAt;
-        private String authorNickname;
+        private User user;
+        private WorkoutDataDto.WorkoutDataResponse workoutData;
 
-        public static PostDto.PostResponse from(Post post) {
-            return PostDto.PostResponse.builder()
+        public static PostResponse from(Post post, WorkoutData workoutData) {
+            return PostResponse.builder()
                     .id(post.getId())
-                    .user(post.getUser())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .imageUrl(post.getImageUrl())
-                    .createdAt(post.getCreatedAt())
+                    .workoutData(WorkoutDataDto.WorkoutDataResponse.from(workoutData))
                     .build();
         }
     }
