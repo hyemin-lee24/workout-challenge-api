@@ -8,8 +8,11 @@ import com.example.api.mapper.WorkoutDataRepository;
 import com.example.api.model.Post;
 import com.example.api.model.User;
 import com.example.api.model.WorkoutData;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,18 +53,15 @@ public class PostService {
         return PostDto.PostResponse.from(savedPost, workoutData);
     }
 
+    @Transactional(readOnly = true)
     public PostDto.PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        return PostDto.PostResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .imageUrl(post.getImageUrl())
-                .createdAt(post.getCreatedAt())
-                .user(post.getUser())
-                .build();
+        WorkoutData workoutData = workoutDataRepository.findByPostAndDeletedFalse(post)
+                .orElse(null);
+
+        return PostDto.PostResponse.from(post, workoutData);
     }
 
     public List<PostDto.PostResponse> getAllPosts() {
@@ -74,5 +74,35 @@ public class PostService {
                         .createdAt(post.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PostDto.PostResponse updatePost(Long postId, PostDto.PostRequest request, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("No permission to edit this post.");
+        }
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+        post.setImageUrl(request.getImageUrl());
+
+        return PostDto.PostResponse.from(post, post.getWorkoutData());
+    }
+
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("You are not the owner of this post");
+        }
+
+        workoutDataRepository.findByPostAndDeletedFalse(post).ifPresent(WorkoutData::softDelete);
+
+        postRepository.delete(post);
     }
 }
