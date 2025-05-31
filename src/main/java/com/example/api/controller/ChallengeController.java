@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+
+    @GetMapping
+    public ResponseEntity<List<ChallengeDto.Response>> getChallenges() {
+        List<ChallengeDto.Response> challenges = challengeService.getAllChallenges();
+        return ResponseEntity.ok(challenges);
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
