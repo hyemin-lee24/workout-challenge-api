@@ -15,4 +15,6 @@ public interface WorkoutDataRepository extends JpaRepository<WorkoutData, Long> 
     Optional<WorkoutData> findByPostIdAndUserId(Long postId, Long userId);
 
     Optional<WorkoutData> findByPostAndDeletedFalse(Post post);
+
+    List<WorkoutData> findByUserIdAndDeletedFalse(Long userId);
 }
