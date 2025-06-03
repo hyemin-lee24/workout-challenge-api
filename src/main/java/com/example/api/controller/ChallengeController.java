@@ -3,6 +3,7 @@ package com.example.api.controller;
 import com.example.api.config.UserPrincipal;
 import com.example.api.dto.ChallengeDto;
 import com.example.api.dto.ChallengeStatsDto;
+import com.example.api.service.ChallengeRankingService;
 import com.example.api.service.ChallengeService;
 import com.example.api.service.ChallengeStatsService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +22,7 @@ public class ChallengeController {
 
     private final ChallengeService challengeService;
     private final ChallengeStatsService challengeStatsService;
+    private final ChallengeRankingService challengeRankingService;
 
     @GetMapping
     public ResponseEntity<List<ChallengeDto.Response>> getChallenges() {
@@ -45,14 +46,23 @@ public class ChallengeController {
         return ResponseEntity.ok(stats);
     }
 
+    @GetMapping("/{challengeId}/summary")
+    public ResponseEntity<ChallengeStatsDto.Summary> getSummary(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(challengeStatsService.getSummary(challengeId));
+    }
+
     @GetMapping("/{challengeId}/ranking")
-    public ResponseEntity<List<ChallengeStatsDto.RankingEntry>> getRanking(
-            @PathVariable Long challengeId
+    public ResponseEntity<List<ChallengeStatsDto.Ranking>> getTop10Ranking(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(challengeRankingService.getTop10Ranking(challengeId));
+    }
+
+    @GetMapping("/{challengeId}/ranking/me")
+    public ResponseEntity<ChallengeStatsDto.Ranking> getMyRank(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<ChallengeStatsDto.RankingEntry> ranking = challengeStatsService.getRanking(challengeId);
-
-        IntStream.range(0, ranking.size()).forEach(i -> ranking.get(i).setRank(i + 1));
-
-        return ResponseEntity.ok(ranking);
+        return ResponseEntity.ok(
+                challengeRankingService.getUserRank(challengeId, userPrincipal.getId())
+        );
     }
 }
