@@ -18,10 +18,18 @@ public class ChallengeStatsDto {
     @Getter
     @Setter
     @Builder
-    public static class RankingEntry {
-        private int rank;
+    public static class Ranking {
         private Long userId;
         private String nickname;
+        private Float totalDistanceKm;
+        private int ranking;
+    }
+
+    @Getter
+    @Builder
+    public static class Summary {
+        private int participantCount;
         private float totalDistanceKm;
+        private float averageDistanceKm;
     }
 }

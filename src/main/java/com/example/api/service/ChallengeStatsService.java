@@ -42,20 +42,19 @@ public class ChallengeStatsService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChallengeStatsDto.RankingEntry> getRanking(Long challengeId) {
+    public ChallengeStatsDto.Summary getSummary(Long challengeId) {
         List<ChallengeEntry> entries = challengeEntryRepository.findByChallengeId(challengeId);
 
-        return entries.stream()
-                .sorted(Comparator.comparing(ChallengeEntry::getTotalDistanceKm).reversed())
-                .map(entry -> {
-                    User user = userRepository.findById(entry.getUser().getId())
-                            .orElseThrow(() -> new RuntimeException("User not found"));
-                    return ChallengeStatsDto.RankingEntry.builder()
-                            .userId(user.getId())
-                            .nickname(user.getNickname())
-                            .totalDistanceKm(entry.getTotalDistanceKm())
-                            .build();
-                })
-                .collect(Collectors.toList());
+        float totalDistance = (float) entries.stream()
+                .mapToDouble(ChallengeEntry::getTotalDistanceKm)
+                .sum();
+
+        float averageDistance = entries.isEmpty() ? 0 : totalDistance / entries.size();
+
+        return ChallengeStatsDto.Summary.builder()
+                .participantCount(entries.size())
+                .totalDistanceKm(totalDistance)
+                .averageDistanceKm(averageDistance)
+                .build();
     }
 }
