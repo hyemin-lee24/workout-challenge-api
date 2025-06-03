@@ -2,7 +2,9 @@ package com.example.api.controller;
 
 import com.example.api.config.UserPrincipal;
 import com.example.api.dto.ChallengeDto;
+import com.example.api.dto.ChallengeProgressDto;
 import com.example.api.dto.ChallengeStatsDto;
+import com.example.api.service.ChallengeProgressService;
 import com.example.api.service.ChallengeRankingService;
 import com.example.api.service.ChallengeService;
 import com.example.api.service.ChallengeStatsService;
@@ -23,6 +25,7 @@ public class ChallengeController {
     private final ChallengeService challengeService;
     private final ChallengeStatsService challengeStatsService;
     private final ChallengeRankingService challengeRankingService;
+    private final ChallengeProgressService challengeProgressService;
 
     @GetMapping
     public ResponseEntity<List<ChallengeDto.Response>> getChallenges() {
@@ -64,5 +67,15 @@ public class ChallengeController {
         return ResponseEntity.ok(
                 challengeRankingService.getUserRank(challengeId, userPrincipal.getId())
         );
+    }
+
+    @GetMapping("/{challengeId}/progress/me")
+    public ResponseEntity<ChallengeProgressDto> getMyProgress(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        ChallengeProgressDto dto =
+                challengeProgressService.getUserProgress(challengeId, userPrincipal.getId());
+        return ResponseEntity.ok(dto);
     }
 }
