@@ -1,5 +1,6 @@
 package com.example.api.model;
 
+import com.example.api.code.ChallengeStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,4 +35,7 @@ public class Challenge {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeStatus status = ChallengeStatus.ONGOING;
 }
