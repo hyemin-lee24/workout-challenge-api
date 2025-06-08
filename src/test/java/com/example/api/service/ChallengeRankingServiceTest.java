@@ -52,5 +52,32 @@ class ChallengeRankingServiceTest {
         assertEquals("test1", result.get(0).getNickname());
         assertEquals("test10", result.get(9).getNickname());
     }
+
+    @Test
+    void getUserRank() {
+        List<ChallengeEntry> entries = List.of(
+                ChallengeEntry.builder()
+                        .user(User.builder().id(1L).nickname("test1").build())
+                        .totalDistanceKm(50.0f)
+                        .build(),
+                ChallengeEntry.builder()
+                        .user(User.builder().id(2L).nickname("test2").build())
+                        .totalDistanceKm(70.0f)
+                        .build(),
+                ChallengeEntry.builder()
+                        .user(User.builder().id(3L).nickname("test3").build())
+                        .totalDistanceKm(60.0f)
+                        .build()
+        );
+
+        when(challengeEntryRepository.findByChallengeId(1L))
+                .thenReturn(entries);
+
+        ChallengeStatsDto.Ranking result = challengeRankingService.getUserRank(1L, 3L);
+
+        assertEquals(2, result.getRanking());
+        assertEquals("test3", result.getNickname());
+        assertEquals(60.0f, result.getTotalDistanceKm());
+    }
 }
 
