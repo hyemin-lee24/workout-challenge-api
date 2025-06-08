@@ -6,6 +6,7 @@ import com.example.api.mapper.ChallengeRepository;
 import com.example.api.mapper.UserRepository;
 import com.example.api.model.Challenge;
 import com.example.api.model.ChallengeEntry;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,20 +20,17 @@ public class ChallengeEntryService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ChallengeEntryDto.Response joinChallenge(Long userId, ChallengeEntryDto.Request request) {
-        long challengeId = request.getChallengeId();
-        System.out.println(userId);
-        System.out.println(challengeId);
+    public ChallengeEntryDto.Response joinChallenge(Long userId, long challengeId) {
         if (challengeEntryRepository.existsByUserIdAndChallengeId(userId, challengeId)) {
             throw new IllegalArgumentException("You have already participated in that challenge.");
         }
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new IllegalArgumentException("Challenge not found."));
-
         ChallengeEntry entry = ChallengeEntry.builder()
                 .challenge(challenge)
-                .user(userRepository.getReferenceById(userId))
+                .user(userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found")))
                 .totalDistanceKm(0f)
                 .build();
 

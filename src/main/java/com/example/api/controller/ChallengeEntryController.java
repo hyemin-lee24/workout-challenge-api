@@ -25,7 +25,7 @@ public class ChallengeEntryController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         ChallengeEntryDto.Response response =
-                challengeEntryService.joinChallenge(userPrincipal.getId(), request);
+                challengeEntryService.joinChallenge(userPrincipal.getId(), request.getChallengeId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
