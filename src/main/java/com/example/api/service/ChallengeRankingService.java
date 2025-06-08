@@ -2,13 +2,13 @@ package com.example.api.service;
 
 import com.example.api.dto.ChallengeStatsDto;
 import com.example.api.mapper.ChallengeEntryRepository;
-import com.example.api.mapper.UserRepository;
 import com.example.api.model.ChallengeEntry;
 import com.example.api.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +38,7 @@ public class ChallengeRankingService {
 
     @Transactional(readOnly = true)
     public ChallengeStatsDto.Ranking getUserRank(Long challengeId, Long userId) {
-        List<ChallengeEntry> entries = challengeEntryRepository.findByChallengeId(challengeId);
+        List<ChallengeEntry> entries = new ArrayList<>(challengeEntryRepository.findByChallengeId(challengeId));
         entries.sort(Comparator.comparing(ChallengeEntry::getTotalDistanceKm).reversed());
 
         for (int i = 0; i < entries.size(); i++) {
